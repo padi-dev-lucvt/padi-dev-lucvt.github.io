@@ -92,7 +92,7 @@
             }
         </style>
         <div class="container">
-            <canvas width="300px" height="200px" id="art"></canvas>
+            <canvas id="sig-canvas" width="320" height="160"></canvas>
             <div id="buttons">
                 <a id="reset">Restart</a>
                 <a id="downloadLnk" class="color" href="#">Save</a>
@@ -112,63 +112,63 @@
     </script>
     <script>
         $(document).ready(function(){
-            const canvas = document.getElementById('art');
-            const ctx = canvas.getContext('2d');
+            var canvas = document.getElementById("sig-canvas");
+            var ctx = canvas.getContext("2d");
+            ctx.strokeStyle = "#222222";
+            ctx.lineWith = 2;
+            // Set up mouse events for drawing
+            var drawing = false;
+            var mousePos = { x:0, y:0 };
+            var lastPos = mousePos;
+            canvas.addEventListener("mousedown", function (e) {
+                    drawing = true;
+            lastPos = getMousePos(canvas, e);
+            }, false);
+            canvas.addEventListener("mouseup", function (e) {
+            drawing = false;
+            }, false);
+            canvas.addEventListener("mousemove", function (e) {
+            mousePos = getMousePos(canvas, e);
+            }, false);
 
-            function getMousePos(canvas, evt) {
-                let rect = canvas.getBoundingClientRect();
+            // Get the position of the mouse relative to the canvas
+            function getMousePos(canvasDom, mouseEvent) {
+                var rect = canvasDom.getBoundingClientRect();
                 return {
-                    x: evt.clientX - rect.left,
-                    y: evt.clientY - rect.top
+                    x: mouseEvent.clientX - rect.left,
+                    y: mouseEvent.clientY - rect.top
                 };
             }
-
-            function mouseMove(evt) {
-                let mousePos = getMousePos(canvas, evt);
-
+            // Get a regular interval for drawing to the screen
+            window.requestAnimFrame = (function (callback) {
+                return window.requestAnimationFrame || 
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.msRequestAnimaitonFrame ||
+                function (callback) {
+                    window.setTimeout(callback, 1000/60);
+                };
+            })();
+            // Draw to the canvas
+            function renderCanvas() {
+            if (drawing) {
+                ctx.moveTo(lastPos.x, lastPos.y);
                 ctx.lineTo(mousePos.x, mousePos.y);
                 ctx.stroke();
+                lastPos = mousePos;
+            }
             }
 
-            canvas.addEventListener('mousedown', (evt) => {
-                let mousePos = getMousePos(canvas, evt);
-
-                ctx.beginPath();
-                ctx.moveTo(mousePos.x, mousePos.y);
-                evt.preventDefault();
-                canvas.addEventListener('mousemove', mouseMove, false);
-            });
-
-            canvas.addEventListener('mouseup', () => {
-                canvas.removeEventListener('mousemove', mouseMove, false);
-            }, false);
-
-            document.getElementById('reset').addEventListener('click', () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }, false);
-
-            document.getElementById('downloadLnk').addEventListener('click', (e) => {
-                e.preventDefault();
-                let imageURL = canvas.toDataURL();
-                $.ajax({
-                    method: 'POST',
-                    url: '{{ route("store-image-base64") }}',
-                    data:{
-                        "_token": "{{ csrf_token() }}",
-                        "image": imageURL
-                    },
-                    success: function(result){
-                        console.log(result);
-                    },
-                    error: function(error){
-                        console.log(error);
-                    }
-                });
-            });
+            // Allow for animation
+            (function drawLoop () {
+                requestAnimFrame(drawLoop);
+                renderCanvas();
+            })();
 
             // Set up touch events for mobile, etc
             canvas.addEventListener("touchstart", function (e) {
-                mousePos = getMousePos(canvas, e);
+                mousePos = getTouchPos(canvas, e);
                 var touch = e.touches[0];
                 var mouseEvent = new MouseEvent("mousedown", {
                     clientX: touch.clientX,
@@ -190,26 +190,34 @@
                 });
                 canvas.dispatchEvent(mouseEvent);
             }, false);
-            
+
+            // Get the position of a touch relative to the canvas
+            function getTouchPos(canvasDom, touchEvent) {
+                var rect = canvasDom.getBoundingClientRect();
+                return {
+                    x: touchEvent.touches[0].clientX - rect.left,
+                    y: touchEvent.touches[0].clientY - rect.top
+                };
+            }
+
             // Prevent scrolling when touching the canvas
             document.body.addEventListener("touchstart", function (e) {
                 if (e.target == canvas) {
                     e.preventDefault();
                 }
             }, false);
-
+            
             document.body.addEventListener("touchend", function (e) {
                 if (e.target == canvas) {
                     e.preventDefault();
                 }
             }, false);
-            
+
             document.body.addEventListener("touchmove", function (e) {
                 if (e.target == canvas) {
                     e.preventDefault();
                 }
             }, false);
-            
         });
     </script>
 </body>
