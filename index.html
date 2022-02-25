@@ -52,7 +52,6 @@
                     <div class="alcohol_favorite_drinkingAreaError"></div>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         <style>
             canvas {
@@ -66,7 +65,7 @@
             }
             #buttons {
                 position: absolute;
-                top: 5px;
+                top: -35px;
                 left: 10px;
             }
             #reset {
@@ -92,14 +91,13 @@
             }
         </style>
         <div class="container">
-            <canvas width="300px" height="200px" id="art"></canvas>
+            <canvas width="480px" height="240px" id="art"></canvas>
             <div id="buttons">
                 <a id="reset">Restart</a>
                 <a id="downloadLnk" class="color" href="#">Save</a>
             </div>
         </div>
     </div>
-    <a href="{{ route('export') }}">Download</a>
     <script
         src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
@@ -189,25 +187,6 @@
                     clientY: touch.clientY
                 });
                 canvas.dispatchEvent(mouseEvent);
-            }, false);
-
-            // Prevent scrolling when touching the canvas
-            document.body.addEventListener("touchstart", function (e) {
-                if (e.target == canvas) {
-                    e.preventDefault();
-                }
-            }, false);
-
-            document.body.addEventListener("touchend", function (e) {
-                if (e.target == canvas) {
-                    e.preventDefault();
-                }
-            }, false);
-            
-            document.body.addEventListener("touchmove", function (e) {
-                if (e.target == canvas) {
-                    e.preventDefault();
-                }
             }, false);
             
             function stopTouchScrolling(canvas){
