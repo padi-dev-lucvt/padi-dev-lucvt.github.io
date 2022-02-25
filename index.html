@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Regitser</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container">
+        <form method="POST">
+            @csrf
+            <div class="form-group">
+                <label for="full_name">Họ tên</label>
+                <input type="text" class="form-control" name="full_name" id="full_name" placeholder="Họ tên">
+            </div>
+            <div class="form-group">
+                <label for="date_of_birth">Ngày sinh</label>
+                <input type="date" class="form-control" name="date_of_birth" id="date_of_birth">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" name="email" id="email" placeholder="Email">
+            </div>
+            <div class="form-group content__profile__action__menu__item__box__group">
+                <label>Thức uống có cồn yêu thích</label>
+                <div class="row">
+                    <p class="col-sm-6">
+                        <input type="checkbox" name="alcohol_favorite_drinking[]" id="alcoholFavorite1" value="1"
+                            autocomplete="off">
+                        <label for="alcoholFavorite1">Single Malt Whisky</label>
+                    </p>
+                    <p class="col-sm-6">
+                        <input type="checkbox" name="alcohol_favorite_drinking[]" id="alcoholFavorite2" value="2"
+                            autocomplete="off">
+                        <label for="alcoholFavorite2">Blended Whisky</label>
+                    </p>
+                    <p class="col-sm-6">
+                        <input type="checkbox" name="alcohol_favorite_drinking[]" id="alcoholFavorite3" value="3"
+                            autocomplete="off">
+                        <label for="alcoholFavorite3">Bia</label>
+                    </p>
+                    <p class="col-sm-6">
+                        <input type="checkbox" name="alcohol_favorite_drinking[]" id="alcoholFavorite4" value="4"
+                            autocomplete="off">
+                        <label for="alcoholFavorite4">Rượu nói chung</label>
+                    </p>
+                    <div class="alcohol_favorite_drinkingAreaError"></div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        <style>
+            canvas {
+                border: 1px solid #cbcbcb;
+                background: #ecf0f1;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+                cursor: crosshair;
+            }
+            .container {
+                position: relative;
+            }
+            #buttons {
+                position: absolute;
+                top: 5px;
+                left: 10px;
+            }
+            #reset {
+                font-size: 1rem;
+                margin: 10px 10px 0 10px;
+                float: left;
+                cursor: pointer;
+                color: #7f8c8d;
+            }
+            #downloadLnk {
+                margin: 10px 10px 0 10px;
+                color: #7f8c8d;
+            }
+            .color {
+                color: #7f8c8d;
+                width: 26px;
+                height: 26px;
+                line-height: 26px;
+                float: left;
+                margin: 10px 1px 0 0;
+                cursor: pointer;
+                text-align: center;
+            }
+        </style>
+        <div class="container">
+            <canvas width="300px" height="200px" id="art"></canvas>
+            <div id="buttons">
+                <a id="reset">Restart</a>
+                <a id="downloadLnk" class="color" href="#">Save</a>
+            </div>
+        </div>
+    </div>
+    <a download="image-name.png" id="download">download img</a>
+    <a href="{{ route('export') }}">Download</a>
+    <script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
+    <script ript src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+    </script>
+    <script>
+        $(document).ready(function(){
+            const canvas = document.getElementById('art');
+            const ctx = canvas.getContext('2d');
+
+            function getMousePos(canvas, evt) {
+                let rect = canvas.getBoundingClientRect();
+                return {
+                    x: evt.clientX - rect.left,
+                    y: evt.clientY - rect.top
+                };
+            }
+
+            // Get the position of a touch relative to the canvas
+            // function getTouchPos(canvasDom, touchEvent) {
+            //     var rect = canvasDom.getBoundingClientRect();
+            //     return {
+            //         x: touchEvent.touches[0].clientX - rect.left,
+            //         y: touchEvent.touches[0].clientY - rect.top
+            //     };
+            // }
+
+            function mouseMove(evt) {
+                let mousePos = getMousePos(canvas, evt);
+
+                ctx.lineTo(mousePos.x, mousePos.y);
+                ctx.stroke();
+            }
+
+            canvas.addEventListener('mousedown', (evt) => {
+                let mousePos = getMousePos(canvas, evt);
+
+                ctx.beginPath();
+                ctx.moveTo(mousePos.x, mousePos.y);
+                evt.preventDefault();
+                canvas.addEventListener('mousemove', mouseMove, false);
+            });
+
+            canvas.addEventListener('mouseup', () => {
+                canvas.removeEventListener('mousemove', mouseMove, false);
+            }, false);
+
+            document.getElementById('reset').addEventListener('click', () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }, false);
+
+            document.getElementById('downloadLnk').addEventListener('click', (e) => {
+                e.preventDefault();
+                let imageURL = canvas.toDataURL();
+                $.ajax({
+                    method: 'POST',
+                    url: '{{ route("store-image-base64") }}',
+                    data:{
+                        "_token": "{{ csrf_token() }}",
+                        "image": imageURL
+                    },
+                    success: function(result){
+                        console.log(result);
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });
+            });
+
+            // Set up touch events for mobile, etc
+            canvas.addEventListener("touchstart", function (e) {
+                mousePos = getMousePos(canvas, e);
+                var touch = e.touches[0];
+                var mouseEvent = new MouseEvent("mousedown", {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            }, false);
+            canvas.addEventListener("touchend", function (e) {
+                var mouseEvent = new MouseEvent("mouseup", {});
+                canvas.dispatchEvent(mouseEvent);
+            }, false);
+            canvas.addEventListener("touchmove", function (e) {
+                var touch = e.touches[0];
+                var mouseEvent = new MouseEvent("mousemove", {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            }, false);
+            
+        });
+    </script>
+</body>
+
+</html>
