@@ -99,7 +99,6 @@
             </div>
         </div>
     </div>
-    <a download="image-name.png" id="download">download img</a>
     <a href="{{ route('export') }}">Download</a>
     <script
         src="https://code.jquery.com/jquery-3.6.0.min.js"
@@ -123,15 +122,6 @@
                     y: evt.clientY - rect.top
                 };
             }
-
-            // Get the position of a touch relative to the canvas
-            // function getTouchPos(canvasDom, touchEvent) {
-            //     var rect = canvasDom.getBoundingClientRect();
-            //     return {
-            //         x: touchEvent.touches[0].clientX - rect.left,
-            //         y: touchEvent.touches[0].clientY - rect.top
-            //     };
-            // }
 
             function mouseMove(evt) {
                 let mousePos = getMousePos(canvas, evt);
@@ -186,10 +176,12 @@
                 });
                 canvas.dispatchEvent(mouseEvent);
             }, false);
+
             canvas.addEventListener("touchend", function (e) {
                 var mouseEvent = new MouseEvent("mouseup", {});
                 canvas.dispatchEvent(mouseEvent);
             }, false);
+
             canvas.addEventListener("touchmove", function (e) {
                 var touch = e.touches[0];
                 var mouseEvent = new MouseEvent("mousemove", {
@@ -197,6 +189,24 @@
                     clientY: touch.clientY
                 });
                 canvas.dispatchEvent(mouseEvent);
+            }, false);
+            // Prevent scrolling when touching the canvas
+            document.body.addEventListener("touchstart", function (e) {
+                if (e.target == canvas) {
+                    e.preventDefault();
+                }
+            }, false);
+
+            document.body.addEventListener("touchend", function (e) {
+                if (e.target == canvas) {
+                    e.preventDefault();
+                }
+            }, false);
+            
+            document.body.addEventListener("touchmove", function (e) {
+                if (e.target == canvas) {
+                    e.preventDefault();
+                }
             }, false);
             
         });
